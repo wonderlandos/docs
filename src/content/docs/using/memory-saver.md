@@ -1,26 +1,62 @@
 ---
 title: Memory Saver
-description: "How WolOS keeps the app in front smooth when memory runs low, by pausing apps in the background and swapping to compressed RAM."
+description: "How Memory Saver gives a background app's memory back to compressed RAM, what it never touches, how to turn it off, and how WolOS keeps one app from taking the desktop down."
 ---
 
-When memory runs low, most systems slow down everywhere at once. WolOS protects what you are using: the app in front and your desktop keep running, and work you are not looking at gives way first.
-
-:::caution[Experimental]
-Memory Saver is experimental. It is being tuned on real machines, and its behaviour may change between releases.
-:::
+Some apps hold hundreds of megabytes while hidden. Memory Saver gives that memory back while you are not using the app, and the app is usable again as soon as you return to it. It is **on by default**.
 
 ## What it does
 
-- **Pauses apps in the background under memory pressure.** WolOS watches the kernel's memory pressure (PSI). When pressure builds, the session pauses background apps with the cgroup v2 freezer. A paused app keeps its windows and its state; it just does not run. It continues the moment you switch back to it.
-- **Swaps to compressed RAM first.** Swap is zram: compressed memory, with zstd, up to half your RAM and at most 8 GiB. Swapping to it is cheap, so idle pages move there early, and they are read back one page at a time.
-- **Keeps what you use in memory.** The kernel's MGLRU page reclaim keeps the pages you are using and gives up the ones you are not.
-- **Spares your desktop if memory runs out.** The window server and the shell are marked to be spared by the out-of-memory killer (`oom_score_adj` -900), and background work is marked to go first (+300). You keep a working screen and can save your work.
+- Each app with a window, with its whole process tree, gets its own systemd scope, so the session daemon `wold` can see what belongs to it.
+- **30 seconds after an app stops being in use**, its memory is given back once, to zram (compressed RAM), by a low-priority worker. Pages charged to the app's scope are reclaimed with `memory.reclaim`; pages charged before the app was adopted are paged out with `process_madvise(MADV_PAGEOUT)`.
+- Switching back cancels the worker. Pages come back by normal page faults, as the app touches them.
+- Changed (dirty) pages are compressed or swapped, **never discarded**. The app resumes unchanged.
 
-## What you notice
+## What it never touches
 
-- Switching back to a paused app can take a moment while it wakes.
-- A background download or sync may pause under pressure and continue after.
+The window server, the shell, audio, the app in front, apps playing sound or video, games, other users' processes, and apps you excluded.
+
+## Settings
+
+| Setting | Default |
+|---|---|
+| Memory Saver | On. Turning it off stops it at once. |
+| Excluded apps | None. Excluded apps keep their memory. |
+| Nap: pause an app that has been hidden and idle for 10 minutes | Off (experimental) |
+
+The choices are kept in `~/.config/wolos/memory-saver.json`.
+
+:::caution[Nap is experimental]
+A paused app stops answering the window server, which then shows its not-responding dialog over it, so Nap stays off by default until that is solved. A browser with busy tabs never counts as idle.
+:::
+
+## What to expect
+
+Measured by the project with four everyday desktop apps (a code editor, a browser with 20 tabs and two chat apps), on zram with zstd, medians of three cycles:
+
+| | Off | Just after saving |
+|---|---|---|
+| Memory held by the four apps (PSS) | 3618 MiB | 1450 MiB |
+| Memory available to the system | 10452 MiB | 11993 MiB |
+| Focus to first frame, code editor | 88 ms | 197 ms |
+
+- 2433 MiB of pages fit in 720 MiB of zram. Audio apps had nothing swapped in any run.
+- Background tabs keep running, so a browser pulls pages back: after 4 minutes the four apps held about 2400 MiB, and available memory sat about 750 MiB above Off. That is the honest steady number.
+- The first switch back after saving can take up to about 110 ms longer.
+- These numbers come from a VM with software rendering. Restore on real hardware has not been measured.
+
+## One app cannot take the desktop with it
+
+Alongside Memory Saver, each app window's scope gets limits, so a runaway app (a fork bomb, a memory bomb, a full file table) cannot freeze the desktop:
+
+- Each app: at most 8192 tasks, 80% of RAM and 25% of swap.
+- The desktop session keeps CPU weight 1000 and 256 MB of protected memory; system services keep 128 MB, so login and Force Quit work under pressure.
+- Fork storms die on their own: an app refused at least 2000 forks per tick, two ticks running, is ended. A program that backs off is never touched.
+- An app killed for memory 4 times within 5 ticks is ended too, so one lost tab does not become a loop. This part is unit tested but not yet run in a test VM.
+- Open files are charged to the app's memory instead of a shared system-wide count. `/tmp` and `/dev/shm` hold 25% of RAM each.
+
+Measured in a throwaway 8 vCPU, 8 GB test VM: a fork bomb in an app window was dead in 7.1 s with 5 ms worst input latency for the desktop; under a memory bomb, starting a program took a median of 3.5 ms instead of 3.7 s. Recovery took 1.0 s or less in every run.
 
 ## Under the hood
 
-The kernel side is documented in [Memory and I/O](/docs/advanced/kernel-memory-io/): PSI, zram and zswap, and the out-of-memory policy.
+Swap is zram with zstd, and the kernel's memory pressure information (PSI) is on. The kernel side is in [Memory and I/O](/docs/advanced/kernel-memory-io/).

@@ -15,7 +15,7 @@ When you pick a disk, the installer checks it without writing anything, and name
 
 A warning names the disk and what is on it. **Erase and Install** checks the disk again before the first write. A refused disk says why, and is left exactly as it was.
 
-If Secure Boot is on, a page explains it before anything is erased. See [Secure Boot and MOK](/docs/getting-started/secure-boot/).
+Before the restart, the installer says in one sentence how this computer will use Secure Boot: its own keys, one blue key screen at the first start, off, or a firmware setting to change first. See [Secure Boot and the shim](/docs/getting-started/secure-boot/).
 
 ## 3. Progress
 
@@ -23,9 +23,9 @@ The Pocket Watch shows the step the installer is on and the time left. In order,
 
 1. lays out the disk with `systemd-repart` (EFI partition and btrfs with `@wolos-a`, `@home`, `@var`), encrypted if you chose that,
 2. copies the system from the USB stick, offline,
-3. writes the boot loader, the kernel and a boot entry that gets three tries,
-4. seals the new system,
-5. checks that the boot entry, kernel, initramfs and file system table are all in place.
+3. seals the new system,
+4. makes this computer's boot keys, signs the boot loader and one unified kernel image for the slot, and writes a boot entry that gets three tries,
+5. checks that the boot entry, the kernel image and the file system table are all in place.
 
 The window does not close mid-install, and the machine does not sleep.
 

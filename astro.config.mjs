@@ -23,7 +23,7 @@ export default defineConfig({
             { label: 'Try WolOS', slug: 'getting-started/try' },
             { label: 'Install WolOS', slug: 'getting-started/install' },
             { label: 'The installer, step by step', slug: 'getting-started/installer' },
-            { label: 'Secure Boot and MOK', slug: 'getting-started/secure-boot' },
+            { label: 'Secure Boot and the shim', slug: 'getting-started/secure-boot' },
           ],
         },
         {

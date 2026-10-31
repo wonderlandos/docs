@@ -3,18 +3,30 @@ title: Install WolOS
 description: "Before you install, what the install does to your disk, and what you get."
 ---
 
-Installing WolOS erases one disk and puts WolOS on it. Read this page once before you start.
+Installing WolOS puts it on a disk you choose: the whole disk, or next to a system you keep. Read this page once before you start.
 
 ## Before you start
 
-- **Back up.** The disk you pick is erased completely, every partition on it.
+- **Back up.** Erase wipes every partition on the disk; Alongside and Manual change partitions too.
 - **Disk:** at least 16 GB. The installer never offers the USB stick it started from, CDs, or disks that are read-only or in use.
 - **Power:** plug a laptop in. The installer keeps the screen on and closing the lid does not sleep the machine while it works.
-- **Secure Boot:** see [Secure Boot and MOK](/docs/getting-started/secure-boot/).
+- **Secure Boot:** the USB stick starts with Secure Boot off or in Setup Mode; the installed system is signed with keys made on your computer. See [Secure Boot and the shim](/docs/getting-started/secure-boot/).
 
 ## Start the installer
 
 Either pick **Install WolOS** in the USB stick's boot menu, or start [Try](/docs/getting-started/try/) and open **Install WolOS** from the Dock. Both run the same installer. [The installer, step by step](/docs/getting-started/installer/) shows each screen.
+
+## Three ways to install
+
+| Method | Does |
+|---|---|
+| **Erase** | Uses the whole disk, laid out as below |
+| **Alongside** | Keeps Windows or another Linux on the disk and adds WolOS next to it |
+| **Manual** | You choose the partitions, and can keep an existing `/home` |
+
+Nothing is written until a summary lists exactly what will change. The plan names every partition it may touch and records a fingerprint of the disk: if the disk changed since, or a partition the plan does not name moves, the install stops. A kept `/home` is mounted only after the system files are in.
+
+Two copies of the system (A/B slots, with rollback and the seal) need Btrfs. With another file system for the system partition, WolOS installs one copy and updates it in place; the installer says so.
 
 ## What ends up on the disk
 

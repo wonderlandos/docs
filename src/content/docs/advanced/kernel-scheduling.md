@@ -90,7 +90,7 @@ The session writes `foreground_uclamp_min=512` and `foreground_timerslack_ns=0` 
 
 - **Upstream:** with PSI on, every sleep and wakeup walks the whole cgroup chain and updates pressure states, even for groups nothing ever reads.
 - **WolKernel:** a new cgroup starts dormant. Task counts stay exact; states and averages start at the first read or trigger of a pressure file. Groups whose state did not change skip the time flush, and IRQ time under 10 us waits for the next switch.
-- **Why:** WolOS reads pressure for a few groups (for [Memory Saver](/docs/using/memory-saver/)), not for every cgroup on the system.
+- **Why:** WolOS reads pressure for a few groups, not for every cgroup on the system.
 - **Off switch:** `wolos_sched.psi_lazy=0`, `psi_lean=0`, `psi_irq_batch_ns=0`, one per part.
 
 ## HWP IO boost

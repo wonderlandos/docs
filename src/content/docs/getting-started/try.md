@@ -7,7 +7,7 @@ You can run WolOS straight from a USB stick before you install anything. Nothing
 
 ## 1. Download the image
 
-Images are published on the [WolOS releases page](https://github.com/wonderlandos/wolos/releases). Each image comes with three files:
+Release images are published on the [wolos-packages releases page](https://github.com/wonderlandos/wolos-packages/releases), next to the `[wolos]` package repository. Earlier preview images are on the [WolOS releases page](https://github.com/wonderlandos/wolos/releases). Each image comes with three files:
 
 | File | What |
 |---|---|
@@ -44,7 +44,7 @@ Restart, open your firmware's boot menu (often F12, F11, F8 or Esc right after p
 | **WolOS** | Starts the live desktop. This is Try. |
 | **Install WolOS** | Starts the same system with the installer |
 
-If Secure Boot is on, read [Secure Boot and MOK](/docs/getting-started/secure-boot/) first.
+The live image is unsigned: turn Secure Boot off (or put the firmware in Setup Mode) to start it. The installed system turns protection back on with its own keys; see [Secure Boot and the shim](/docs/getting-started/secure-boot/).
 
 ## While you try
 
