@@ -1,0 +1,37 @@
+---
+title: WolOS Docs
+description: "Documentation for WolOS, a calm, simple desktop on the PC you already own."
+template: splash
+hero:
+  tagline: A calm, simple desktop. On the PC you already own. Here is how to try it, install it, use it and build on it.
+  image:
+    file: ../../assets/wolos-mark.svg
+  actions:
+    - text: Get started
+      link: /docs/getting-started/welcome/
+      icon: right-arrow
+    - text: WolKernel vs upstream
+      link: /docs/advanced/wolkernel/
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+:::caution[Active development]
+WolOS is in active development. The image installs offline and boots, and the full desktop is still being proven on real hardware. Expect rough edges.
+:::
+
+<CardGrid>
+  <Card title="Getting started" icon="rocket">
+    [Try WolOS](/docs/getting-started/try/) from a USB stick, then [install it](/docs/getting-started/install/). The [installer](/docs/getting-started/installer/) and [Secure Boot](/docs/getting-started/secure-boot/) pages walk you through each screen.
+  </Card>
+  <Card title="Using WolOS" icon="laptop">
+    The [Store](/docs/using/store/), the [AUR tab](/docs/using/aur/), optional [ClamAV scanning](/docs/using/clamav/), [Memory Saver](/docs/using/memory-saver/) and [updates with rollback](/docs/using/updates/).
+  </Card>
+  <Card title="Developers" icon="seti:c">
+    [libwol](/docs/developers/libwol/), the app API with a stable C ABI, [wopkg and .wol packages](/docs/developers/wopkg/), and [building the image](/docs/developers/building/).
+  </Card>
+  <Card title="Advanced" icon="setting">
+    [What WolKernel does differently from upstream Linux](/docs/advanced/wolkernel/), patch by patch, with the switch that turns each one off.
+  </Card>
+</CardGrid>
